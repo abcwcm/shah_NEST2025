@@ -1,0 +1,271 @@
+---
+title: "annotation S24-22889_A6_tumor_inner"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F)
+```
+
+```{r, message=FALSE}
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(data.table)
+library(Voyager)
+library(SpatialFeatureExperiment)
+library(SingleCellExperiment)
+library(SpatialExperiment)
+library(scater) # devel version of plotExpression
+library(scran)
+library(bluster)
+library(ggplot2)
+library(patchwork)
+library(stringr)
+library(spdep)
+library(BiocParallel)
+library(BiocSingular)
+theme_set(theme_bw())
+library(VennDiagram)
+library(data.table)
+library(plyr)
+library(ComplexUpset)
+library(purrr)
+library(tidyr)
+```
+
+
+### For lunaphores.
+
+```{r}
+sample_name <- "S24-22889_A6"
+region_name <- "tumor_inner"
+```
+
+
+
+```{r}
+
+lunaphore_binary_df <- read.csv(paste0("/SSD/maa7095/spatial_techniques/manish_comet/sep_new_ROI/",sample_name, "_",region_name, "_sigma_binary_res/table_sigma_6.csv"))
+cell_ids <- lunaphore_binary_df$cell_id
+#lunaphore_binary_df$cell_id <- NULL
+
+table_true_markers <- data.frame(colSums(lunaphore_binary_df == 'True'))
+names(table_true_markers) <- c("freq")
+table_true_markers$probes <- rownames(table_true_markers)
+```
+
+```{r}
+dim(lunaphore_binary_df)
+```
+
+
+```{r}
+lunaphore_binary_df[lunaphore_binary_df == "True"] <- 1
+lunaphore_binary_df[lunaphore_binary_df == "False"] <- 0
+```
+
+
+```{r}
+# Subset: remove rows where all marker columns are zero
+sub_lunaphore_binary_df <- lunaphore_binary_df[rowSums(lunaphore_binary_df[, -ncol(lunaphore_binary_df)] != 0) > 0, ]
+
+print(paste0("We have left ", nrow(sub_lunaphore_binary_df), " cells after removing cells with no positive probes"))
+
+```
+
+
+```{r}
+cell_id_filtered <- sub_lunaphore_binary_df$cell_id
+sub_lunaphore_binary_df$cell_id <- NULL
+```
+
+### Markers.
+
+
+```{r}
+cell_type_probes <- read.table("/SSD/maa7095/spatial_techniques/manish_comet/COMET_new_Data/annotation/CELESTA_tunning/celesta_probes.txt", sep = "\t", header = T)
+cell_type_probes
+```
+
+```{r}
+#cell_type_probes <- cell_type_probes %>% filter(!"Lymphatic_endothelium" == celll_type)
+#endo <- data.frame(celll_type="Lymphatic_endothelium",probes = "CD34")
+#cell_type_probes <- rbind(cell_type_probes,endo)
+```
+
+
+
+```{r}
+valid_probes <- c("CD20","PAX5","CD3E","NCAM1","panCK","CD34","CD68","CD138","SMA","VIMENTIN","CD163","CD8","TNFRSF8-CD30","CD4","FOXP3","PD-1","CTLA-4","LAG3","TIM-3","CD206-MRC1")
+valid_probes <- sort(valid_probes)
+
+```
+
+## {-}
+
+## Cell annotation 1 {.tabset}
+
+### Upset plot.
+
+```{r}
+cols_list <- apply(sub_lunaphore_binary_df, 1, function(row) paste(names(row)[row != 0], collapse = ", "))
+
+table_with_class <- data.frame(Row = seq_len(nrow(sub_lunaphore_binary_df)), probes = cols_list, stringsAsFactors = FALSE)
+
+table_with_class$cell_id <- cell_id_filtered
+table_with_class$Row <- NULL
+
+clean_probes <- function(probe_str, valid_list) {
+  if (is.na(probe_str) || probe_str == "") {
+    return(probe_str)
+  }
+  #split the ifferent probes
+  probe_list <- unlist(strsplit(probe_str, ", "))
+  #looks for probes in the valid_probes
+  filtered_probes <- probe_list[probe_list %in% valid_list]
+  
+  #if it doesnt find any of the valid_probes jus keep it as it is
+  if (length(filtered_probes) == 0) {
+    return(probe_str)
+  }
+  
+  paste(filtered_probes, collapse = ", ")
+}
+
+table_with_class$probes2 <- sapply(table_with_class$probes, clean_probes, valid_list = valid_probes)
+
+names(table_with_class) <-c ("probes2", "cell_id","probes")
+
+table_with_class$probes <- gsub(pattern = " ", replacement = "", table_with_class$probes)
+
+#here just subset based on rows with known markers. the rest are probes that have not been used as markers
+to_list_markers <- table_with_class %>%
+  filter(sapply(str_split(probes, ","), function(x) any(trimws(x) %in% valid_probes)))
+
+freq_of_markers <- as.data.frame(table(to_list_markers$probes))
+freq_of_markers <- freq_of_markers %>% arrange(desc(Freq))
+freq_of_markers$Var1 <- as.factor(freq_of_markers$Var1)
+
+# its too noisy i need to subset for top combinations. 
+sub_freq_of_markers <- freq_of_markers %>% filter(Freq>100)
+subsets <- sub_freq_of_markers$Var1
+
+## Check if each subset mentions each symptom or not
+marker_binary_map <- map(subsets, \(x) str_detect(x, valid_probes)) %>%
+  set_names(nm = subsets) %>%
+  map(\(x) set_names(x, nm = valid_probes)) %>%
+  bind_rows(.id = "subset") %>%
+  left_join(freq_of_markers, join_by(subset == Var1))
+indvs <- marker_binary_map %>%
+  uncount(Freq) 
+indvs$subset <- NULL
+
+plot_vals <- upset(data = indvs, intersect = valid_probes, 
+                   name="", 
+                   min_size = 0,
+                   width_ratio = 0.125) +
+  labs(title = paste0("Top most frequent marker combinations for slide "),
+       caption = "")
+plot_vals[[2]][["layers"]][[2]][["geom"]][["default_aes"]][["hjust"]] <- -0.1
+plot_vals[[2]][["layers"]][[2]][["geom"]][["default_aes"]][["angle"]] <- 45
+plot_vals[[2]][["layers"]][[2]][["geom"]][["default_aes"]][["size"]] <- 2
+
+```
+
+```{r, fig.height=8}
+plot_vals
+```
+
+
+### Annotation frequency.
+
+```{r}
+classification_res <- join(cell_type_probes, table_with_class, by="probes", type = "full")
+```
+
+```{r}
+sub_table_with_class <- table_with_class %>%
+  filter(str_detect(probes, "VIMENTIN|Podoplanin|SMA"))
+
+```
+
+
+```{r}
+#remove Podoplin, Vmentin and SMA from all the coexpressions.
+probes_to_remove <- c("VIMENTIN", "Podoplanin", "SMA")
+
+sub_table_with_class2 <- sub_table_with_class %>%
+  mutate(
+    probes = sapply(
+      str_split(probes, ","),
+      function(x) paste(setdiff(x, probes_to_remove), collapse = ",")
+    )
+  )
+
+sub_table_with_class2 <- sub_table_with_class2 %>%
+  filter(probes != "")
+```
+
+```{r}
+classification_res2 <- join(cell_type_probes, sub_table_with_class2, by="probes", type = "full")
+```
+
+```{r}
+classification_res <- rbind(classification_res, classification_res2)
+```
+
+
+```{r}
+classification_res <- classification_res %>%
+  filter(!is.na(cell_id))
+
+classification_res$celll_type[is.na(classification_res$celll_type)] <- "Unknown"
+```
+
+
+```{r}
+numbers_cell_types <- as.data.frame(table(classification_res$celll_type))
+kableExtra::kable(table(classification_res$celll_type))
+
+```
+
+
+
+
+
+
+### Bar plot
+
+
+```{r, fig.height=8}
+ggplot(numbers_cell_types, aes(fill=Var1, y=Var1, x=Freq)) + 
+    geom_bar(position="dodge", stat="identity") +  theme_bw() + ggtitle("Annotated cells") +
+  xlab("Number of Cells") +
+  ylab("Cell Type") +
+  theme(
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 12)
+  )
+
+```
+
+
+
+## {-}
+
+
+```{r}
+#save annotation
+write.table(classification_res, paste0('/SSD/maa7095/spatial_techniques/manish_comet/sep_new_ROI/', sample_name, '_', region_name, '_sigma_binary_res/cell_annotation.txt'), quote = F, row.names = F, sep = "\t")
+```
+
+
+```{r}
+sessionInfo()
+```
+
+
+
