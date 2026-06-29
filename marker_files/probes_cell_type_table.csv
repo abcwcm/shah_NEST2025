@@ -1,0 +1,36 @@
+celll_type,new_cell_type_name
+B_cell,B_cell
+T_cell,CD3E_CD4_CD8 (Tcell)
+NK,NK
+Epithelial,Epithelial
+Lymphatic_endothelium,Lymphatic_endothelium
+Endothelial,Endothelial
+Macrophages,Macrophages
+Plasma,Plasma
+Smooth_muscle,Smooth_muscle
+Stromal,Stromal
+Activated_B_cell,Activated_B_cell
+CD4_Tcell,CD3E_CD4 (CD4_Tcell)
+CD8_Tcell,CD3E_CD8 (CD8_Tcell)
+T_regs,CD3E_FOXP3 (T_regs)
+CD4_Tregs,CD3E_CD4_FOXP3 (CD4_Tregs)
+CD8_Tregs,CD3E_CD8_FOXP3 (CD8_Tregs)
+PD1_Tcell,PD1_Tcell
+CD4_PD1_T-cell,CD4_PD1_T-cell
+CD8_PD1_Tcell,CD8_PD1_Tcell
+CTLA4_Tcell,CTLA4_Tcell
+CD4_CTLA4_Tcell,CD4_CTLA4_Tcell
+CD8_CTLA4_Tcell,CD8_CTLA4_Tcell
+LAG3_Tcell,LAG3_Tcell
+CD4_LAG3_Tcell,CD4_LAG3_Tcell
+CD8_LAG3_Tcell,CD8_LAG3_Tcell
+TIM3_Tcell,TIM3_Tcell
+CD4_TIM3_Tcell,CD4_TIM3_Tcell
+CD8_TIM3_Tcell,CD8_TIM3_Tcell
+Activated_Tcell,Activated_Tcell
+Th1_Macrophage,Th1_Macrophage
+Th2_Macrophage,Th2_Macrophage
+CD8,CD8
+CD4,CD4
+FOXP3,FOXP3
+Unknown,Unknown

@@ -1,5 +1,5 @@
 ---
-title: "annotation S24-22889_A6_tumor_inner"
+title: "annotation NEST2-04_tumor_inner"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -38,7 +38,7 @@ library(tidyr)
 ### For lunaphores.
 
 ```{r}
-sample_name <- "S24-22889_A6"
+sample_name <- "NEST2-04"
 region_name <- "tumor_inner"
 ```
 
@@ -84,17 +84,9 @@ sub_lunaphore_binary_df$cell_id <- NULL
 
 
 ```{r}
-cell_type_probes <- read.table("/SSD/maa7095/spatial_techniques/manish_comet/COMET_new_Data/annotation/CELESTA_tunning/celesta_probes.txt", sep = "\t", header = T)
+cell_type_probes <- read.table("marker_files/celesta_probes.txt", sep = "\t", header = T)
 cell_type_probes
 ```
-
-```{r}
-#cell_type_probes <- cell_type_probes %>% filter(!"Lymphatic_endothelium" == celll_type)
-#endo <- data.frame(celll_type="Lymphatic_endothelium",probes = "CD34")
-#cell_type_probes <- rbind(cell_type_probes,endo)
-```
-
-
 
 ```{r}
 valid_probes <- c("CD20","PAX5","CD3E","NCAM1","panCK","CD34","CD68","CD138","SMA","VIMENTIN","CD163","CD8","TNFRSF8-CD30","CD4","FOXP3","PD-1","CTLA-4","LAG3","TIM-3","CD206-MRC1")
