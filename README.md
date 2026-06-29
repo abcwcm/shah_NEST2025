@@ -2,6 +2,10 @@
 
 ![](WCM_MB_LOGO_HZSS1L_CLR_RGB_new.png)
 
+## Data availability
+
+Data that support the findings of this study are available from the corresponding author upon written reasonable request. 
+
 ## Samples
 
 | Sample_name | ROI | Condition | MSI  | Naming in figures |
@@ -27,6 +31,8 @@
 
 
 ## DATA ANALYSIS
+
+Immunofluorescence intensity values were extracted from TIFF images using HALO software for selected ROIs. Mean nuclear intensity values were used for the protein markers FOXP3, PCNA, PAX5, and MKI67, while mean cytoplasmic intensity values were used for the remaining markers. This produced one table per **Sample_name**, from which we proceeded as follows:
 
 - **Step 1: QC, normalization and probes poisitivity assesment**. From single cell intensity values, exclude cells with the lowest 2% of Area and 2% of DAPI signal. Then for each ROI/probe, generate a binary expression matrix following the 6σ approach. [QC](https://github.com/abcwcm/shah_NEST2025/blob/main/scripts/qc_binary_NEST2-04_tumor_internal.ipynb). We will run this script for each sample_name/ROI of interest.
 - **Step 2: cell annotation**. Using the binary matrix, annotate cells on the positivity of certain markers (probes), and the negativity of the rest of the markers. In a second round of annotation, use VIMENTIN, Podoplanin and SMA probes as neutral probes, so any of the cells can be positive for them. [cell_typing](https://github.com/abcwcm/shah_NEST2025/blob/main/scripts/annotation_NEST2-04_tumor_internal.Rmd).  We will run this script for each sample_name/ROI of interest.
