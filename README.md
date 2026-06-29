@@ -4,6 +4,29 @@
 
 ## DATA AVAILABILITY
 
+## Samples
+
+| Sample_name | ROI | Condition | MSI  | Naming in figures |
+|-------------|-----|-----------|-----|-------------------|
+| NEST2-06 | tumor_bed | Responder | Stable | NEST2-06_Resection |
+| NEST1-06 | tumor_bed | Responder | High | NEST1-06_Resection |
+| NEST1-11 | tumor | Responder | Stable | NEST1-11_Baseline |
+| NEST1-04 | tumor | Baseline | Stable | NEST1-04_Baseline |
+| NEST1-05 | tumor | Baseline | High | NEST1-05_Baseline |
+| NEST1-05 | tumor_bed | Responder | High | NEST1-05_Resection |
+| NEST2-04 | tumor | Baseline | Stable | NEST2-04_Baseline |
+| NEST1-04 | tumor | Non-responder | Stable | NEST1-04_Resection |
+| NEST1-01 | tumor_bed | Responder | Stable | NEST1-01_Resection |
+| NEST2-03 | tumor_bed | Responder | Stable | NEST2-03_Resection |
+| NEST1-08 | tumor_inner | Non-responder | Stable | NEST1-08_Resection |
+| NEST1-11 | tumor_bed | Responder | Stable | NEST1-11_Resection |
+| NEST2-06 | tumor | Responder | Stable | NEST2-06_Baseline |
+| NEST2-08a | tumor | Responder | Stable | NEST2-08a_Baseline |
+| NEST2-01 | tumor_bed | Responder | Stable | NEST2-01_Resection |
+| NEST2-04 | tumor_inner | Non-responder | Stable | NEST2-04_Resection |
+| NEST2-10 | tumor_inner | Non-responder | Stable | NEST2-10_Resection |
+
+
 
 ## DATA ANALYSIS
 
