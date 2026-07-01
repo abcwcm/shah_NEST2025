@@ -4,7 +4,7 @@
 
 ## Data availability
 
-Data that support the findings of this study are available from the corresponding author upon written reasonable request. 
+Intensity values for each sample can be downloaded from GEO: GSE337193.
 
 ## Samples
 
